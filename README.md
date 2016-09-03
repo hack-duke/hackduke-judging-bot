@@ -15,8 +15,7 @@ This bot serves to facilitate pairwise judging of applicants and projects during
 ```bash
 $ cp ../hackduke-secrets/.env-hackduke-judging-bot .env  # assuming the projects share the same parent folder
 $ bundle install                                         # Install project dependencies
-$ bundle exec rackup -p 5000                             # Launch server on port of choice
-$ curl localhost:5000/start --user user:password         # Start judge bot with basic auth (another terminal window)
+$ bundle exec rackup                                     # Launch bot
 ```
 
 ##Merging changes
@@ -27,9 +26,14 @@ Please use 2 spaces to indent
 
 ##Deployment instructions
 - currently using heroku for deployment
+- run curl https://hackduke-judging-bot.herokuapp.com/start --user user:password to start bot
+- heroku ps:stop web to stop bot (may take a few seconds...)
 
-##Testing
-- TODO
+##Applicant Status CSV instructions
+- Run the update applicant status command on a local version of the slack bot
+- CSV should appear in the public folder
 
-##Continous integration
-- TODO
+## TODO
+- Better development + deployment workflow
+- Testing
+- Continous integration
