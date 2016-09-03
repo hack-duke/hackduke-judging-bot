@@ -60,6 +60,8 @@ GEM
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
+    rack-ssl (1.4.1)
+      rack
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)
@@ -93,6 +95,7 @@ DEPENDENCIES
   dotenv
   giphy
   httparty
+  rack-ssl
   sinatra
   slack
   slack-ruby-client
