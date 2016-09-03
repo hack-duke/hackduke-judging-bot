@@ -4,7 +4,7 @@
 This bot serves to facilitate pairwise judging of applicants and projects during HackDuke events. Judges will be asked to select between two choices, which is sent to an algorithm API.
 
 ##Project Structure
-- The command themselves can be found in judge_bot.rb
+- The command themselves can be found in src/judge_bot.rb
 - Helper methods are in judge_leaderboard_handler.rb and judge_participant_handler.rb
 - algorithm_request_manager.rb, registration_request_manager.rb, and judge_session_validator.rb are self-explanatory
 - config.ru is the starting point for the application
@@ -13,7 +13,7 @@ This bot serves to facilitate pairwise judging of applicants and projects during
 ```bash
 $ cp ../hackduke-secrets/.env-hackduke-judging-bot .env  # assuming the projects share the same parent folder
 $ bundle install                                         # Install project dependencies
-$ bundle exec rackup -p {PORT}                           # Launch on your port of choice
+$ bundle exec rackup                                     # Launch bot
 ```
 
 ##Merging changes

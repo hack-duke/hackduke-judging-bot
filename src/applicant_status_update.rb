@@ -10,7 +10,7 @@ def update_participant_statuses(accept_num, waitlist_num, results, season, event
       sorted_participants << participants[order.to_i]
     end
   end
-  CSV.open("public/applicant_statuses_#{event}_#{season}_#{year}.csv", "wb") do |csv|
+  CSV.open("applicant_statuses_#{event}_#{season}_#{year}.csv", "wb") do |csv|
   sorted_participants.each_with_index do |participant, index|
     status = 'accepted'
     if index < accept_num

@@ -1,5 +1,5 @@
 require 'slack-ruby-client'
-require_relative 'slack-ruby-bot/slack-ruby-bot'
+require_relative '../slack-ruby-bot/slack-ruby-bot'
 require_relative 'applicant_status_update.rb'
 require_relative 'algorithm_request_manager.rb'
 require_relative 'registration_request_manager.rb'
