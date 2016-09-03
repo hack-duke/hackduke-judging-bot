@@ -1,5 +1,5 @@
 
-class JudgeRequestManager
+class AlgorithmRequestManager
 
   @@base_url = "https://hackduke-judging.herokuapp.com/"
   @session_name = 'session'

@@ -64,5 +64,5 @@ end
 
 
 def all_participant_ids_for_event
-  @api_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+  @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
 end
