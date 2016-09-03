@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+gem 'celluloid-io'
+gem 'slack'
+gem 'giphy'
+gem 'slack-ruby-client'
+gem 'sinatra'
+gem 'dotenv'
+gem 'httparty'
