@@ -1,7 +1,7 @@
 # HackDuke Judging Bot
 
 ##Overview
-This bot serves to facilitate pairwise judging of applicants and projects during HackDuke events. Judges will be asked to select between two choices, which is sent to an algorithm API.
+This bot serves to facilitate pairwise judging of applicants and projects during HackDuke events. Judges will be asked to select between two choices, which is sent to an algorithm API that creates an ordered list over time. 
 
 ##Project Structure
 - The command themselves can be found in src/judge_bot.rb
