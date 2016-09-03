@@ -10,6 +10,8 @@ This bot serves to facilitate pairwise judging of applicants and projects during
 - config.ru is the starting point for the application
 
 ##Getting Started
+- use rbenv for ruby versioning (currently on 2.2.3)
+
 ```bash
 $ cp ../hackduke-secrets/.env-hackduke-judging-bot .env  # assuming the projects share the same parent folder
 $ bundle install                                         # Install project dependencies

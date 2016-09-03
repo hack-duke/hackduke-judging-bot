@@ -10,8 +10,7 @@ get '/' do
   "Hello World"
 end
 
-
 get '/start' do
   Thread.new {JudgeBot.run}
-  'Judging bot started'
+  'Judging Bot Started'
 end
