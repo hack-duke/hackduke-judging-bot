@@ -1,12 +1,12 @@
 require 'slack-ruby-client'
-require_relative 'slack-ruby-bot/slack-ruby-bot'
+require 'dotenv'
+require_relative '../slack-ruby-bot/slack-ruby-bot'
 require_relative 'applicant_status_update.rb'
-require_relative 'judge_request_manager.rb'
-require_relative 'api_request_manager.rb'
+require_relative 'algorithm_request_manager.rb'
+require_relative 'registration_request_manager.rb'
 require_relative 'judge_session_validator.rb'
 require_relative 'judge_participant_handler.rb'
 require_relative 'judge_leaderboard_handler.rb'
-require 'dotenv'
 
 class JudgeBot < SlackRubyBot::Bot
 
@@ -17,8 +17,8 @@ class JudgeBot < SlackRubyBot::Bot
 
   # constants
   @slack = Slack::Web::Client.new
-  @request_manager = JudgeRequestManager.new
-  @api_request_manager = APIRequestManager.new
+  @algo_request_manager = AlgorithmRequestManager.new
+  @reg_request_manager = RegistrationRequestManager.new
   @session_validator = JudgeSessionValidator.new
   @success = 'success'
   @error = 'error'
@@ -89,12 +89,12 @@ class JudgeBot < SlackRubyBot::Bot
     valid_type =  @session_validator.validate_type(@bot_type, @bot_types, client, data)
     return unless valid_season && valid_event && valid_year && valid_type
     session_name = @bot_season + @bot_event + @bot_year.to_s + @bot_type
-    ids = @api_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+    ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
     if ids.length == 0
       client.say(text: "The event #{@bot_event} #{@bot_season} #{@bot_year} is invalid", channel: data.channel)
       return 
     end
-    error = @request_manager.start_judging_session(ids.length, session_name)
+    error = @algo_request_manager.start_judging_session(ids.length, session_name)
     if error == ''
       @judging_status = true
       client.say(text: 'An active ' + @bot_type + ' judging session for ' + @bot_event + ' ' + 
@@ -121,7 +121,7 @@ class JudgeBot < SlackRubyBot::Bot
       else
         favored = @choice_b
       end
-      error = @request_manager.perform_judge_decision(data.user, favored)
+      error = @algo_request_manager.perform_judge_decision(data.user, favored)
       if error == '' 
         client.say(text: 'Successfully performed judge decision, please choose again!', channel: data.channel)
         judge_command(client, data, match)
@@ -135,7 +135,7 @@ class JudgeBot < SlackRubyBot::Bot
     return unless @session_validator.active_judging_session(@judging_status, client, data)
     accept_num = "#{match[:accept_num]}".to_i
     waitlist_num = "#{match[:waitlist_num]}".to_i
-    body = @request_manager.get_results
+    body = @algo_request_manager.get_results
     if body['error'].to_s == ''
       results = body['votes'].keys
       update_participant_statuses(accept_num, waitlist_num, results, @bot_season, @bot_event, @bot_year)
@@ -150,7 +150,7 @@ class JudgeBot < SlackRubyBot::Bot
     id = "#{match[:id]}".to_i
     output = output_for_participant(id, data, false)
     if output == @success
-       p = @api_request_manager.participant_for_id(id)
+       p = @reg_request_manager.participant_for_id(id)
        client.web_client.chat_postMessage(
         channel: data.channel,
         as_user: true,
@@ -168,7 +168,7 @@ class JudgeBot < SlackRubyBot::Bot
   end
 
   command 'leaderboard' do |client, data, match|
-    body = @request_manager.get_results
+    body = @algo_request_manager.get_results
     if body['error'].to_s == ''
       judge_counts = body['judge_counts']
       if judge_counts.length == 0
@@ -195,13 +195,13 @@ end
 
 def judge_command(client, data, match)
   return unless @session_validator.active_judging_session(@judging_status, client, data)
-  result = @request_manager.get_judge_decision(data.user)
+  result = @algo_request_manager.get_judge_decision(data.user)
   if result.length == 1 
     client.say(text: result[0], channel: data.channel)
   end
   participants = all_participant_ids_for_event
-  participant_one = @api_request_manager.participant_for_id(participants[result[0]])
-  participant_two = @api_request_manager.participant_for_id(participants[result[1]])
+  participant_one = @reg_request_manager.participant_for_id(participants[result[0]])
+  participant_two = @reg_request_manager.participant_for_id(participants[result[1]])
   post_participants_message(client, data, participant_one, participant_two, @default_message_color)
 end
   

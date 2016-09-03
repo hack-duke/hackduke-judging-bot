@@ -1,6 +1,6 @@
 require 'httparty'
 
-class APIRequestManager
+class RegistrationRequestManager
 
   @@base_url = "https://hackduke-api.herokuapp.com/"
 
