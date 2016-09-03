@@ -1,4 +1,5 @@
 require 'slack-ruby-client'
+require 'dotenv'
 require_relative '../slack-ruby-bot/slack-ruby-bot'
 require_relative 'applicant_status_update.rb'
 require_relative 'algorithm_request_manager.rb'
@@ -6,7 +7,6 @@ require_relative 'registration_request_manager.rb'
 require_relative 'judge_session_validator.rb'
 require_relative 'judge_participant_handler.rb'
 require_relative 'judge_leaderboard_handler.rb'
-require 'dotenv'
 
 class JudgeBot < SlackRubyBot::Bot
 
