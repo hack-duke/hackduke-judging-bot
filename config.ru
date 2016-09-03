@@ -12,5 +12,6 @@ end
 
 
 get '/start' do
-  JudgeBot.run
+  Thread.new {JudgeBot.run}
+  'Judging bot started'
 end
