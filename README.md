@@ -27,7 +27,7 @@ Please use 2 spaces to indent
 ##Deployment instructions
 - currently using heroku for deployment
 - run curl https://hackduke-judging-bot.herokuapp.com/start --user user:password to start bot
-- heroku ps:stop web to stop bot (may take a few seconds...)
+- run heroku ps:stop web to stop bot (may take a few seconds...)
 
 ##Applicant Status CSV instructions
 - Run the update applicant status command on a local version of the slack bot

@@ -12,6 +12,10 @@ configure :development do
   JudgeBot.run
 end
 
+configure :production do
+  use Rack::SSL
+end
+
 use Rack::Auth::Basic, "Protected Area" do |username, password|
   username == ENV['BASIC_AUTH_USERNAME'] && password == ENV['BASIC_AUTH_PASSWORD']
 end
