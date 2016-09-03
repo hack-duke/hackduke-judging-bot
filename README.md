@@ -16,7 +16,7 @@ This bot serves to facilitate pairwise judging of applicants and projects during
 $ cp ../hackduke-secrets/.env-hackduke-judging-bot .env  # assuming the projects share the same parent folder
 $ bundle install                                         # Install project dependencies
 $ bundle exec rackup -p 5000                             # Launch server on port of choice
-$ curl localhost:5000/start                              # Start judge bot
+$ go to localhost:5000/start                             # Start judge bot
 ```
 
 ##Merging changes
