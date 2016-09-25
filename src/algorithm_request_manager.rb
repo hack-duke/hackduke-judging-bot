@@ -34,6 +34,7 @@ class AlgorithmRequestManager
     endpoint = @@base_url + 'results'
     body = HTTParty.post(endpoint, :body => {:session_name => @session_name}.to_json,
                        		 :headers => { 'Content-Type' => 'application/json' })
+    puts body
   end
 
   def curr_session

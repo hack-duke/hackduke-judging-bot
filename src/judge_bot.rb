@@ -167,6 +167,38 @@ class JudgeBot < SlackRubyBot::Bot
     end
   end
 
+  match /^rank (?<season>\w*) (?<event>\w*) (?<year>\d{4}*) by (?<attribute>\w*)$/ do |client, data, match|
+    @bot_season = "#{match[:season]}".to_s
+    @bot_event = "#{match[:event]}".to_s
+    @bot_year = "#{match[:year]}".to_i
+    attribute = "#{match[:attribute]}".to_s
+    valid_season = @session_validator.validate_season(@bot_season, client, data)
+    valid_event = @session_validator.validate_event(@bot_event, client, data)
+    valid_year = @session_validator.validate_year(@bot_year, client, data)
+    return unless valid_season && valid_event && valid_year
+    if (attribute == 'school')
+      participants = @reg_request_manager.participants_for_event(@bot_season, @bot_year, @bot_event)
+      duke_students = []
+      non_duke_students = []
+      participants.each do |participant|
+        if ((participant['role']['school'].include? 'Duke') && (duke_students.length < 250))
+          duke_students << participant
+        else 
+          if (!(participant['role']['school'].include? 'Duke') && (non_duke_students.length < 250))
+            non_duke_students << participant
+          end
+        end
+      end
+      duke_students.each do |student|
+        @reg_request_manager.update_participant_status(student['person']['id'], 'accepted')
+      end
+      non_duke_students.each do |student|
+        @reg_request_manager.update_participant_status(student['person']['id'], 'accepted')
+      end
+    end
+  end
+
+
   command 'leaderboard' do |client, data, match|
     body = @algo_request_manager.get_results
     if body['error'].to_s == ''
