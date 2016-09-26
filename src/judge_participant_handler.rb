@@ -63,6 +63,30 @@ def fields_for_applicant(p)
 end
 
 
+def rank_participants_by_school
+  participants = @reg_request_manager.participants_for_event(@bot_season, @bot_year, @bot_event)
+  duke_students = []
+  non_duke_students = []
+  participants.each do |participant|
+    if ((participant['role']['school'].include? 'Duke') && (duke_students.length < 50))
+      duke_students << participant
+    else 
+      if (!(participant['role']['school'].include? 'Duke') && (non_duke_students.length < 50))
+        non_duke_students << participant
+      end
+    end
+  end
+  update_chosen_participants(duke_students, 'accepted')
+  update_chosen_participants(non_duke_students, 'accepted')
+end
+
+def update_chosen_participants(participants, status)
+  participants.each do |participant|
+    @reg_request_manager.update_participant_status(participant['role']['id'], status)
+  end
+end
+
+
 def all_participant_ids_for_event
   @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
 end

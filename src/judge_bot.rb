@@ -28,6 +28,7 @@ class JudgeBot < SlackRubyBot::Bot
   @bot_types = ['applicant', 'project']
   @choice_a = 'CHOICE_A'
   @choice_b = 'CHOICE_B'
+  @participants_per_category = 250
 
   # judging session variables
   @judging_status = false
@@ -177,24 +178,7 @@ class JudgeBot < SlackRubyBot::Bot
     valid_year = @session_validator.validate_year(@bot_year, client, data)
     return unless valid_season && valid_event && valid_year
     if (attribute == 'school')
-      participants = @reg_request_manager.participants_for_event(@bot_season, @bot_year, @bot_event)
-      duke_students = []
-      non_duke_students = []
-      participants.each do |participant|
-        if ((participant['role']['school'].include? 'Duke') && (duke_students.length < 250))
-          duke_students << participant
-        else 
-          if (!(participant['role']['school'].include? 'Duke') && (non_duke_students.length < 250))
-            non_duke_students << participant
-          end
-        end
-      end
-      duke_students.each do |student|
-        @reg_request_manager.update_participant_status(student['person']['id'], 'accepted')
-      end
-      non_duke_students.each do |student|
-        @reg_request_manager.update_participant_status(student['person']['id'], 'accepted')
-      end
+      rank_participants_by_school(@participants_per_category)
     end
   end
 
@@ -204,7 +188,7 @@ class JudgeBot < SlackRubyBot::Bot
     if body['error'].to_s == ''
       judge_counts = body['judge_counts']
       if judge_counts.length == 0
-        client.say(text: "No entries have been judged!", channel: data.channel) 
+        client.say(text: "No entries have been judged!", channel: data.channel)
       else
         client.web_client.chat_postMessage(
           channel: data.channel,
@@ -222,8 +206,9 @@ class JudgeBot < SlackRubyBot::Bot
       client.say(text: body['error'], channel: data.channel)
     end
   end
-
 end
+
+def 
 
 def judge_command(client, data, match)
   return unless @session_validator.active_judging_session(@judging_status, client, data)
