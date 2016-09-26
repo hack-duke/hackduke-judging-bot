@@ -63,21 +63,34 @@ def fields_for_applicant(p)
 end
 
 
-def rank_participants_by_school
-  participants = @reg_request_manager.participants_for_event(@bot_season, @bot_year, @bot_event)
-  duke_students = []
-  non_duke_students = []
+def rank_participants(participants)
+  triangle_students = []
+  non_triangle_students = []
   participants.each do |participant|
-    if ((participant['role']['school'].include? 'Duke') && (duke_students.length < 50))
-      duke_students << participant
-    else 
-      if (!(participant['role']['school'].include? 'Duke') && (non_duke_students.length < 50))
-        non_duke_students << participant
+    school = participant['role']['school']
+    if (!school.include?('Duke') && !school.include?('North Carolina'))
+      if non_triangle_students.length < @participants_per_category
+        non_triangle_students << participant
       end
+      participants.delete(participant)
     end
   end
-  update_chosen_participants(duke_students, 'accepted')
-  update_chosen_participants(non_duke_students, 'accepted')
+  triangle_students = rank_triangle_participants(participants)
+  update_chosen_participants(triangle_students, 'accepted')
+  update_chosen_participants(non_triangle_students, 'accepted')
+end
+
+def rank_triangle_participants(participants)
+  new_hackers = []
+  veteran_hackers = []
+  participants.each do |participant|
+    if ((participant['role']['github'].nil? || participant['role']['graduation_year'] == 2020) && new_hackers.length < 100)
+      new_hackers << participant
+    elsif (veteran_hackers.length < 150)
+        veteran_hackers << participant
+    end
+  end
+  triangle_hackers = new_hackers + veteran_hackers
 end
 
 def update_chosen_participants(participants, status)

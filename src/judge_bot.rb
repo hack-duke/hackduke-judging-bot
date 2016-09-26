@@ -168,18 +168,17 @@ class JudgeBot < SlackRubyBot::Bot
     end
   end
 
-  match /^rank (?<season>\w*) (?<event>\w*) (?<year>\d{4}*) by (?<attribute>\w*)$/ do |client, data, match|
+  match /^rank (?<season>\w*) (?<event>\w*) (?<year>\d{4}*)$/ do |client, data, match|
     @bot_season = "#{match[:season]}".to_s
     @bot_event = "#{match[:event]}".to_s
     @bot_year = "#{match[:year]}".to_i
-    attribute = "#{match[:attribute]}".to_s
     valid_season = @session_validator.validate_season(@bot_season, client, data)
     valid_event = @session_validator.validate_event(@bot_event, client, data)
     valid_year = @session_validator.validate_year(@bot_year, client, data)
     return unless valid_season && valid_event && valid_year
-    if (attribute == 'school')
-      rank_participants_by_school(@participants_per_category)
-    end
+    participants = @reg_request_manager.participants_for_event(@bot_season, @bot_year, @bot_event)
+    # Assuming participants is sorted by rank
+    rank_participants(participants)
   end
 
 
@@ -207,8 +206,6 @@ class JudgeBot < SlackRubyBot::Bot
     end
   end
 end
-
-def 
 
 def judge_command(client, data, match)
   return unless @session_validator.active_judging_session(@judging_status, client, data)
