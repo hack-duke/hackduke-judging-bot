@@ -28,7 +28,9 @@ class JudgeBot < SlackRubyBot::Bot
   @bot_types = ['applicant', 'project']
   @choice_a = 'CHOICE_A'
   @choice_b = 'CHOICE_B'
+  # @year_freshman = 2020
   @participants_per_category = 250
+  @new_hacker_limit = 100
 
   # judging session variables
   @judging_status = false
@@ -91,10 +93,6 @@ class JudgeBot < SlackRubyBot::Bot
     return unless valid_season && valid_event && valid_year && valid_type
     session_name = @bot_season + @bot_event + @bot_year.to_s + @bot_type
     ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-    if ids.length == 0
-      client.say(text: "The event #{@bot_event} #{@bot_season} #{@bot_year} is invalid", channel: data.channel)
-      return 
-    end
     error = @algo_request_manager.start_judging_session(ids.length, session_name)
     if error == ''
       @judging_status = true
@@ -135,10 +133,11 @@ class JudgeBot < SlackRubyBot::Bot
   match /^update applicant status (?<accept_num>\d*) (?<waitlist_num>\d*)$/ do |client, data, match|
     return unless @session_validator.active_judging_session(@judging_status, client, data)
     accept_num = "#{match[:accept_num]}".to_i
-    waitlist_num = "#{match[:waitlist_num]}".to_i
-    body = @algo_request_manager.get_results
+    waitlist_num = "#{match[:waitlist_num]}".to_s
+    ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+    body = @algo_request_manager.get_results(ids.length)
     if body['error'].to_s == ''
-      results = body['votes'].keys
+      results = body['ranking']
       update_participant_statuses(accept_num, waitlist_num, results, @bot_season, @bot_event, @bot_year)
       client.say(text: 'Participant statuses updated!', channel: data.channel)
     else 
@@ -181,9 +180,10 @@ class JudgeBot < SlackRubyBot::Bot
     rank_participants(participants)
   end
 
-
   command 'leaderboard' do |client, data, match|
-    body = @algo_request_manager.get_results
+    return unless @session_validator.active_judging_session(@judging_status, client, data)
+    ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+    body = @algo_request_manager.get_results(ids.length)
     if body['error'].to_s == ''
       judge_counts = body['judge_counts']
       if judge_counts.length == 0
@@ -207,15 +207,25 @@ class JudgeBot < SlackRubyBot::Bot
   end
 end
 
-def judge_command(client, data, match)
-  return unless @session_validator.active_judging_session(@judging_status, client, data)
-  result = @algo_request_manager.get_judge_decision(data.user)
-  if result.length == 1 
-    client.say(text: result[0], channel: data.channel)
+def judge_command(client, data, match, count=0)
+  puts count
+  if count < 1000
+    return unless @session_validator.active_judging_session(@judging_status, client, data)
+    ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+    result = @algo_request_manager.get_judge_decision(ids.length, data.user)
+    # if result.length == 1 
+    #   client.say(text: result[0], channel: data.channel)
+    # end
+    participants = all_participant_ids_for_event
+    participant_one = @reg_request_manager.participant_for_id(participants[result[0]])
+    participant_two = @reg_request_manager.participant_for_id(participants[result[1]])
+    if participant_one['role']['id'] < participant_two['role']['id']
+      @algo_request_manager.perform_judge_decision(data.user, @choice_a)
+    else
+      @algo_request_manager.perform_judge_decision(data.user, @choice_b)
+    end
+    judge_command(client, data, match, count+1)
   end
-  participants = all_participant_ids_for_event
-  participant_one = @reg_request_manager.participant_for_id(participants[result[0]])
-  participant_two = @reg_request_manager.participant_for_id(participants[result[1]])
   post_participants_message(client, data, participant_one, participant_two, @default_message_color)
 end
   
