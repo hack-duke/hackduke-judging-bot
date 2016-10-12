@@ -5,7 +5,7 @@ def post_participants_message(client, data, participant_one, participant_two, co
         as_user: true,
         attachments: [
           {
-            pretext: "Please choose between the following two entries",
+            pretext: "Please choose between the following two entries by typing 'select first' or 'select second'",
             author_name:  "First Applicant",
             fields: fields_for_applicant(participant_one),
             color: @default_message_color
@@ -36,30 +36,50 @@ def output_for_participant(id, data, requires_current_reviewer=true)
 end
 
 # creates slack message field for returning an applicant's info
-def fields_for_applicant(p)
-  if p['resume'] == nil
+def fields_for_applicant(participant)
+  puts participant
+  role = participant['role']
+  if role['resume'] == nil
     resume_link = @no_resume
   else
-    resume_link = p['resume']
+    resume_link = role['resume']
   end
-  if p['github'] == nil
+  if role['website'] == nil
+    website_link = @no_website
+  else
+    website_link = role['website']
+  end
+  if role['portfolio'] == nil
+    portfolio_link = @no_portfolio
+  else
+    portfolio_link = role['portfolio']
+  end
+  if role['github'] == nil
     github_link = @no_github
   else
-    github_link = p['github']
+    github_link = role['github']
   end
   fields = []
   i = 0
-  while i < p['custom'].length
+  while i < role['custom'].length
     hash = {}
-    hash["title"] = p['custom'][i]
-    hash["value"] = p['custom'][i+1]
+    hash["title"] = role['custom'][i]
+    hash["value"] = role['custom'][i+1]
     hash["short"] = false
     fields << hash
     i += 2
   end
+  fields << {title: "Portfolio Link", value: portfolio_link, short: portfolio_link == @no_portfolio}
+  fields << {title: "Website Link", value: website_link, short: website_link == @no_website}
   fields << {title: "Resume Link", value: resume_link, short: resume_link == @no_resume}
   fields << {title: "Github Link", value: github_link, short: github_link == @no_github}
   fields
+end
+
+def update_chosen_participants(participants, status)
+  participants.each do |participant|
+    @reg_request_manager.update_participant_status(participant['role']['id'], status)
+  end
 end
 
 
