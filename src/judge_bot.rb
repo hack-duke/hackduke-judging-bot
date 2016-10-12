@@ -78,7 +78,7 @@ class JudgeBot < SlackRubyBot::Bot
     judge_command(client, data, match)
   end
 
-  match /^start judging session (?<season>\w*) (?<event>\w*) (?<year>\d{4}*) (?<type>\w*)$/ do |client, data, match|
+  match /^start judging session (?<season>\w*) (?<event>\w*) (?<year>\d{4}*) (?<type>\w*)$/i do |client, data, match|
     if @judging_status
       client.say(text: 'An active ' + @bot_type + ' judging session for ' + @bot_event + ' ' + 
                  @bot_season + ' ' + @bot_year.to_s + ' is already active!' , channel: data.channel)
@@ -112,9 +112,9 @@ class JudgeBot < SlackRubyBot::Bot
                @bot_season + ' ' + @bot_year.to_s + ' has been stopped' , channel: data.channel)
   end
 
-  match /^select (?<firstsecond>\w*)$/ do |client, data, match|
+  match /^select (?<firstsecond>\w*)$/i do |client, data, match|
     result = "#{match[:firstsecond]}".to_s
-    if result != 'first' && result != 'second'
+    if result.downcase != 'first' && result.downcase != 'second'
       client.say(text: 'You must select the first or second!', channel: data.channel)
     else
       if result == 'first'
@@ -132,7 +132,7 @@ class JudgeBot < SlackRubyBot::Bot
     end
   end
 
-  match /^update applicant status (?<accept_num>\d*) (?<waitlist_num>\d*)$/ do |client, data, match|
+  match /^update applicant status (?<accept_num>\d*) (?<waitlist_num>\d*)$/i do |client, data, match|
     return unless @session_validator.active_judging_session(@judging_status, client, data)
     accept_num = "#{match[:accept_num]}".to_i
     waitlist_num = "#{match[:waitlist_num]}".to_s
@@ -147,7 +147,7 @@ class JudgeBot < SlackRubyBot::Bot
     end
   end
 
-  match /^applicant (?<id>\w*)/ do |client, data, match|
+  match /^applicant (?<id>\w*)/i do |client, data, match|
     return unless @session_validator.active_judging_session(@judging_status, client, data)
     id = "#{match[:id]}".to_i
     output = output_for_participant(id, data, false)
@@ -169,7 +169,7 @@ class JudgeBot < SlackRubyBot::Bot
     end
   end
 
-  match /^rank (?<season>\w*) (?<event>\w*) (?<year>\d{4}*)$/ do |client, data, match|
+  match /^rank (?<season>\w*) (?<event>\w*) (?<year>\d{4}*)$/i do |client, data, match|
     @bot_season = "#{match[:season]}".to_s
     @bot_event = "#{match[:event]}".to_s
     @bot_year = "#{match[:year]}".to_i
