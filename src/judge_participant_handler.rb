@@ -5,7 +5,7 @@ def post_participants_message(client, data, participant_one, participant_two, co
         as_user: true,
         attachments: [
           {
-            pretext: "Please choose between the following two entries by typing 'select first' or 'select second'",
+            pretext: "Please choose between the following two entries by typing '1' or '2'",
             author_name:  "First Applicant",
             fields: fields_for_applicant(participant_one),
             color: @default_message_color

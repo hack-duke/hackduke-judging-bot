@@ -7,7 +7,7 @@ class JudgeSessionValidator
   # determines whether the judging session is active and replies if there's not an active session
   def active_judging_session(judging_status, client, data)
       if !judging_status
-        client.say(text: "There is not an active judging session", channel: data.channel)
+        client.say(text: "There is not an active judging session!", channel: data.channel)
       end
       return judging_status
   end
