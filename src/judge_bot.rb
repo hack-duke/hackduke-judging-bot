@@ -25,6 +25,8 @@ class JudgeBot < SlackRubyBot::Bot
   @default_message_color = '#36a64f'
   @no_resume = 'No resume'
   @no_github = 'No github'
+  @no_portfolio = 'No portfolio'
+  @no_website = 'No website'
   @bot_types = ['applicant', 'project']
   @choice_a = 'CHOICE_A'
   @choice_b = 'CHOICE_B'
@@ -43,13 +45,13 @@ class JudgeBot < SlackRubyBot::Bot
     title 'Judging Bot'
     desc 'Performs pairwise judging on applicants and projects.'
 
-    command 'start judging session <season> <event> <year> <type>' do
-      desc 'This starts a judging session with the specified season, event, year, and type'
-    end
+    # command 'start judging session <season> <event> <year> <type>' do
+    #   desc 'This starts a judging session with the specified season, event, year, and type'
+    # end
 
-    command 'stop judging session' do 
-      desc 'This stops the currently active judging session if available'
-    end
+    # command 'stop judging session' do 
+    #   desc 'This stops the currently active judging session if available'
+    # end
 
     command 'judge' do
       desc 'Retrieves a pair of entries for the user to judge.'
@@ -63,13 +65,13 @@ class JudgeBot < SlackRubyBot::Bot
       desc 'Shows a leaderboard for the judges'
     end
 
-    command 'update applicant status <accept number> <waitlist number>' do
-      desc 'Updates accepted, waitlisted, and rejected participants based on given numbers (applicant-specific)'
-    end
+    # command 'update applicant status <accept number> <waitlist number>' do
+    #   desc 'Updates accepted, waitlisted, and rejected participants based on given numbers (applicant-specific)'
+    # end
 
-    command 'applicant <ID>' do
-      desc 'Displays information about the specified applicant (applicant-specific)'
-    end
+    # command 'applicant <ID>' do
+    #   desc 'Displays information about the specified applicant (applicant-specific)'
+    # end
   end
 
   command 'judge' do |client, data, match|
@@ -207,25 +209,13 @@ class JudgeBot < SlackRubyBot::Bot
   end
 end
 
-def judge_command(client, data, match, count=0)
-  puts count
-  if count < 1000
-    return unless @session_validator.active_judging_session(@judging_status, client, data)
-    ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-    result = @algo_request_manager.get_judge_decision(ids.length, data.user)
-    # if result.length == 1 
-    #   client.say(text: result[0], channel: data.channel)
-    # end
-    participants = all_participant_ids_for_event
-    participant_one = @reg_request_manager.participant_for_id(participants[result[0]])
-    participant_two = @reg_request_manager.participant_for_id(participants[result[1]])
-    if participant_one['role']['id'] < participant_two['role']['id']
-      @algo_request_manager.perform_judge_decision(data.user, @choice_a)
-    else
-      @algo_request_manager.perform_judge_decision(data.user, @choice_b)
-    end
-    judge_command(client, data, match, count+1)
-  end
+def judge_command(client, data, match)
+  return unless @session_validator.active_judging_session(@judging_status, client, data)
+  ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+  result = @algo_request_manager.get_judge_decision(ids.length, data.user)
+  participants = all_participant_ids_for_event
+  participant_one = @reg_request_manager.participant_for_id(participants[result[0]])
+  participant_two = @reg_request_manager.participant_for_id(participants[result[1]])
   post_participants_message(client, data, participant_one, participant_two, @default_message_color)
 end
   

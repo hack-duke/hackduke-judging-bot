@@ -5,7 +5,7 @@ def post_participants_message(client, data, participant_one, participant_two, co
         as_user: true,
         attachments: [
           {
-            pretext: "Please choose between the following two entries",
+            pretext: "Please choose between the following two entries by typing 'select first' or 'select second'",
             author_name:  "First Applicant",
             fields: fields_for_applicant(participant_one),
             color: @default_message_color
@@ -44,6 +44,16 @@ def fields_for_applicant(participant)
   else
     resume_link = role['resume']
   end
+  if role['website'] == nil
+    website_link = @no_website
+  else
+    website_link = role['website']
+  end
+  if role['portfolio'] == nil
+    portfolio_link = @no_portfolio
+  else
+    portfolio_link = role['portfolio']
+  end
   if role['github'] == nil
     github_link = @no_github
   else
@@ -59,7 +69,8 @@ def fields_for_applicant(participant)
     fields << hash
     i += 2
   end
-  fields << {title: "ID", value: role['id'], short: true}
+  fields << {title: "Portfolio Link", value: portfolio_link, short: portfolio_link == @no_portfolio}
+  fields << {title: "Website Link", value: website_link, short: website_link == @no_website}
   fields << {title: "Resume Link", value: resume_link, short: resume_link == @no_resume}
   fields << {title: "Github Link", value: github_link, short: github_link == @no_github}
   fields
