@@ -113,6 +113,7 @@ class JudgeBot < SlackRubyBot::Bot
   end
 
   match /^select (?<firstsecond>\w*)$/i do |client, data, match|
+    return unless @session_validator.active_judging_session(@judging_status, client, data)
     result = "#{match[:firstsecond]}".to_s
     if result.downcase != 'first' && result.downcase != 'second'
       client.say(text: 'You must select the first or second!', channel: data.channel)
