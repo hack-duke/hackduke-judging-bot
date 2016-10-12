@@ -9,7 +9,8 @@ end
 
 def create_leaderboard_hash(judge_counts)
   leaderboard_hash = Hash.new
-  judge_counts.each do |slack_id, count|
+  judge_counts.each do |hash|
+    slack_id, count = hash.first
     judge = name_from_slack_id(slack_id)
     leaderboard_hash[judge] = count
   end
