@@ -58,6 +58,11 @@ class RegistrationRequestManager
     body = HTTParty.get(endpoint, add_auth({}))
   end
 
+  def query_for_key_value(key, value)
+    endpoint = @@bas_url + 'people/query_for_key_value'
+    options = { body: {:key => key, :value => value, :role => 'participant' }
+  end
+
   def add_auth(options)
     options.merge!({basic_auth: {username: ENV['BASIC_AUTH_USERNAME'], password: ENV['BASIC_AUTH_PASSWORD']}})       
   end

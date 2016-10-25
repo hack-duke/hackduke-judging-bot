@@ -158,20 +158,20 @@ class JudgeBot < SlackRubyBot::Bot
     end
   end
 
-  # match /^update applicant status (?<accept_num>\d*) (?<waitlist_num>\d*)$/i do |client, data, match|
-  #   return unless @session_validator.active_judging_session(@judging_status, client, data)
-  #   accept_num = "#{match[:accept_num]}".to_i
-  #   waitlist_num = "#{match[:waitlist_num]}".to_s
-  #   ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-  #   body = @algo_request_manager.get_results(ids.length)
-  #   if body['error'].to_s == ''
-  #     results = body['ranking']
-  #     update_participant_statuses(accept_num, waitlist_num, results, @bot_season, @bot_event, @bot_year)
-  #     client.say(text: 'Participant statuses updated!', channel: data.channel)
-  #   else 
-  #     client.say(text: body['error'], channel: data.channel)
-  #   end
-  # end
+  match /^update applicant status (?<accept_num>\d*) (?<waitlist_num>\d*)$/i do |client, data, match|
+    return unless @session_validator.active_judging_session(@judging_status, client, data)
+    accept_num = "#{match[:accept_num]}".to_i
+    waitlist_num = "#{match[:waitlist_num]}".to_s
+    ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+    body = @algo_request_manager.get_results(ids.length)
+    if body['error'].to_s == ''
+      results = body['ranking']
+      update_participant_statuses(accept_num, waitlist_num, results, @bot_season, @bot_event, @bot_year)
+      client.say(text: 'Participant statuses updated!', channel: data.channel)
+    else 
+      client.say(text: body['error'], channel: data.channel)
+    end
+  end
 
   # match /^rank (?<season>\w*) (?<event>\w*) (?<year>\d{4}*)$/i do |client, data, match|
   #   @bot_season = "#{match[:season]}".to_s
