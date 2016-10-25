@@ -3,30 +3,15 @@
 # simultaneously creates csv to be saved at /public/applicant_statuses.csv and
 # updates the statuses of participants based on their score
 def update_participant_statuses(accept_num, waitlist_num, results, season, event, year)
-  participants = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-  sorted_participants = []
-  results.each do |order|
-    if order.to_i < participants.length
-      sorted_participants << participants[order.to_i]
-    end
-  end
   CSV.open("public/applicant_statuses_#{event}_#{season}_#{year}.csv", "wb") do |csv|
-  sorted_participants.each_with_index do |index|
-    status = 'accepted'
-    participant = @reg_request_manager.participant_for_id(index)
-    # if index < accept_num.to_i
-    #   if participant['role']['attending'] == 1
-    #     status = 'confirmed'
-    #   end
-    #   @reg_request_manager.update_participant_status(participant['role']['id'], status)
-    # elsif index < accept_num.to_i + waitlist_num.to_i
-    #   status = 'waitlisted'
-    #   @reg_request_manager.update_participant_status(participant['role']['id'], status)
-    # else
-    #   status = 'rejected'
-    #   @reg_request_manager.update_participant_status(participant['role']['id'], status)
-    # end
-    csv << [participant['school'], participant['resume']]
+  results.each do |resume|
+    body = @reg_request_manager.query_for_key_value('resume', result, 'participant')
+    if body.length != 0
+      participant = body['role']
+      person = body['person']
+      csv << [person['first_name'], person['last_name'], person['ethnicity'],
+              person['gender'], participant['id'], participant['school'], participant['resume']]
+    end
     end
   end
 end

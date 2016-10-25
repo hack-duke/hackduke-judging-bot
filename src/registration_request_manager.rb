@@ -42,7 +42,7 @@ class RegistrationRequestManager
     options = { body: {:id => id, :role => 'participant', :participant => {:status => status}} }
     body = HTTParty.post(endpoint, add_auth(options))
     if body.code != 200
-      return 
+      return {}
     else
       return body
     end
@@ -58,9 +58,15 @@ class RegistrationRequestManager
     body = HTTParty.get(endpoint, add_auth({}))
   end
 
-  def query_for_key_value(key, value)
+  def query_for_key_value(key, value, role)
     endpoint = @@bas_url + 'people/query_for_key_value'
-    options = { body: {:key => key, :value => value, :role => 'participant' }
+    options = { body: {:key => key, :value => value, :role => role}
+    body = HTTParty.post(endpoint, add_auth(options))
+    if body.code != 200
+      return {}
+    else
+      return body
+    end
   end
 
   def add_auth(options)
