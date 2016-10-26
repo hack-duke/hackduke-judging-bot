@@ -27,9 +27,13 @@ def create_leaderboard(leaderboard_hash)
 end
 
 def name_from_slack_id(slack_id) 
-  users = @slack.users_info(user: slack_id)
-  users = users_to_hash(users.to_s)
-  name = users["name"]
+  begin
+    users = @slack.users_info(user: slack_id)
+    users = users_to_hash(users.to_s)
+    name = users["name"]
+  rescue
+    slack_id
+  end
 end
 
 # slack web client api returns string of information which must be transformed into hash to be useable

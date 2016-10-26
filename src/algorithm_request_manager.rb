@@ -4,18 +4,19 @@ class AlgorithmRequestManager
   @@base_url = "https://hackduke-judging.herokuapp.com/"
   @session_name = 'session'
 
-  def start_judging_session(number, session_name)
+  def start_judging_session(alts, session_name)
     endpoint = @@base_url + 'init'
     @session_name = session_name
-    options = { :body => {:num_alts => number, :session_name => @session_name}.to_json,
+    puts alts
+    options = { :body => {:num_alts => alts, :session_name => @session_name}.to_json,
                          :headers => { 'Content-Type' => 'application/json' } }
     body = HTTParty.post(endpoint, add_auth(options))
     return body['error'].to_s
   end
 
-  def get_judge_decision(number, judge_id)
+  def get_judge_decision(alts, judge_id)
     endpoint = @@base_url + "get_decision"
-    options = { :body => {:num_alts => number, :judge_id => judge_id, :session_name => @session_name}.to_json,
+    options = { :body => {:num_alts => alts, :judge_id => judge_id, :session_name => @session_name}.to_json,
                          :headers => { 'Content-Type' => 'application/json' } }
     body = HTTParty.post(endpoint, add_auth(options))
     if body['error'].to_s == ''
@@ -33,9 +34,9 @@ class AlgorithmRequestManager
     return body['error'].to_s
   end
 
-  def get_results(number)
+  def get_results(alts)
     endpoint = @@base_url + 'results'
-    options = { :body => {:num_alts => number, :session_name => @session_name}.to_json,
+    options = { :body => {:num_alts => alts, :session_name => @session_name}.to_json,
                            :headers => { 'Content-Type' => 'application/json' } }
     body = HTTParty.post(endpoint, add_auth(options))
   end

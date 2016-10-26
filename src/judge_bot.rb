@@ -53,7 +53,7 @@ class JudgeBot < SlackRubyBot::Bot
       desc 'Selects the first or second entry in a pairwise comparison'
     end
 
-    command 'leaderboard' do
+    command 'l or leaderboard' do
       desc 'Shows a leaderboard for the judges'
     end
 
@@ -119,7 +119,7 @@ class JudgeBot < SlackRubyBot::Bot
     return unless valid_season && valid_event && valid_year && valid_type
     session_name = @bot_season + @bot_event + @bot_year.to_s + @bot_type
     ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-    error = @algo_request_manager.start_judging_session(ids.length, session_name)
+    error = @algo_request_manager.start_judging_session(ids, session_name)
     if error == ''
       @judging_status = true
       client.say(text: 'An active ' + @bot_type + ' judging session for ' + @bot_event + ' ' + 
@@ -163,7 +163,7 @@ class JudgeBot < SlackRubyBot::Bot
     accept_num = "#{match[:accept_num]}".to_i
     waitlist_num = "#{match[:waitlist_num]}".to_s
     ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-    body = @algo_request_manager.get_results(ids.length)
+    body = @algo_request_manager.get_results(ids)
     if body['error'].to_s == ''
       results = body['ranking']
       update_participant_statuses(accept_num, waitlist_num, results, @bot_season, @bot_event, @bot_year)
@@ -218,7 +218,7 @@ end
 def leaderboard_command(client, data, match)
   return unless @session_validator.active_judging_session(@judging_status, client, data)
   ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-  body = @algo_request_manager.get_results(ids.length)
+  body = @algo_request_manager.get_results(ids)
   if body['error'].to_s == ''
     judge_counts = body['judge_counts']
     if judge_counts.length == 0
@@ -244,10 +244,9 @@ end
 def judge_command(client, data, match)
   return unless @session_validator.active_judging_session(@judging_status, client, data)
   ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-  result = @algo_request_manager.get_judge_decision(ids.length, data.user)
-  participants = all_participant_ids_for_event
-  participant_one = @reg_request_manager.participant_for_id(participants[result[0]])
-  participant_two = @reg_request_manager.participant_for_id(participants[result[1]])
+  result = @algo_request_manager.get_judge_decision(ids, data.user)
+  participant_one = @reg_request_manager.participant_for_id(result[0])
+  participant_two = @reg_request_manager.participant_for_id(result[1])
   post_participants_message(client, data, participant_one, participant_two, @default_message_color)
 end
   

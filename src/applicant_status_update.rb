@@ -4,18 +4,19 @@
 # updates the statuses of participants based on their score
 def update_participant_statuses(accept_num, waitlist_num, results, season, event, year)
   CSV.open("public/applicant_statuses_#{event}_#{season}_#{year}.csv", "wb") do |csv|
-  results.each do |resume|
-    body = @reg_request_manager.query_for_key_value('resume', result, 'participant')
-    if body.length != 0
-      participant = body['role']
-      person = body['person']
-      csv << [person['first_name'], person['last_name'], person['ethnicity'],
-              person['gender'], participant['id'], participant['school'], participant['resume']]
-    end
+    results.each do |id|
+      body = @reg_request_manager.participant_for_id(id)
+      if body.length != 0
+        participant = body['role']
+        person = body['person']
+        csv << [person['first_name'], person['last_name'], person['ethnicity'],
+                person['gender'], participant['id'], participant['school'], participant['resume']]
+      else
+        puts resume
+      end
     end
   end
 end
-
 
 
 def rank_participants(participants)
