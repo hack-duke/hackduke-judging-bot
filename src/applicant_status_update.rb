@@ -9,7 +9,7 @@ def update_participant_statuses(accept_num, waitlist_num, results, season, event
       if body.length != 0
         participant = body['role']
         person = body['person']
-        csv << [person['first_name'], person['last_name'], person['ethnicity'], 
+        csv << [person['first_name'], person['last_name'], person['ethnicity'], person['over_eighteen'],
                 person['gender'], participant['id'], participant['school'], participant['resume'],
                 participant['graduation_year'], participant['github']]
       else
