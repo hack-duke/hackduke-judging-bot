@@ -39,16 +39,40 @@ def rank_participants(participants)
   non_triangle_students = []
   participants.each do |participant|
     school = participant['role']['school']
-    if (!school.include?('Duke') && !school.include?('North Carolina'))
-      if non_triangle_students.length < @participants_per_category
-        non_triangle_students << participant
-      end
-      participants.delete(participant)
+    if (@triangle_schools.include?(school))
+      triangle_students << participant
+    else
+      non_triangle_students << participant
     end
   end
-  triangle_students = rank_triangle_participants(participants)
-  update_chosen_participants(triangle_students, 'registered')
-  update_chosen_participants(non_triangle_students, 'registered')
+  non_triangle_students = rank_other_participants(non_triangle_students)
+  triangle_students = rank_triangle_participants(triangle_students)
+  # update_chosen_participants(triangle_students, 'registered')
+  # update_chosen_participants(non_triangle_students, 'registered')
+end
+
+def rank_other_participants(participants)
+  # We want to accept people so they can use the buses.
+  non_triangle_students = []
+  participants.each do |participant|
+    if non_triangle_students.length < @participants_per_category
+      non_triangle_students << participant
+    end
+  end
+
+  bus_students = []
+  flight_students = []
+  student_counter = 0
+  non_triangle_students.each do |participant|
+    school = participant['role']['school']
+    if @bus_schools.include?(school)
+      bus_students << participant
+    elsif student_counter < @flight_hackers
+      flight_students << participant
+      student_counter += 1
+    end
+  end
+  non_triangle_students
 end
 
 # Probably should consider ethnicity and gender
@@ -57,6 +81,7 @@ def rank_triangle_participants(participants)
   veteran_hackers = []
   participants.each do |participant|
     info = participant['role']
+    # we should probably manually check the "new" hackers
     if ((info['github'].nil? || info['graduation_year'] == @year_freshman) && new_hackers.length < @new_hacker_limit)
       new_hackers << participant
     elsif (veteran_hackers.length < @participants_per_category - @new_hacker_limit)

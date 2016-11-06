@@ -3,6 +3,7 @@ def fields_for_leaderboard(judge_counts)
   fields = []
   leaderboard_hash = create_leaderboard_hash(judge_counts)
   fields << {title: "Leader", value: "@" + leaderboard_hash.sort_by {|k,v| v}.reverse[0][0].to_s, short: true}
+  fields << {title: "Total Reviews", value: leaderboard_hash.values.inject(:+), short: true}
   fields << {title: "Full Leaderboard", value: create_leaderboard(leaderboard_hash), short: false}
   fields
 end

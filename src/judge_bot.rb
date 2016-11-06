@@ -30,9 +30,12 @@ class JudgeBot < SlackRubyBot::Bot
   @bot_types = ['applicant', 'project']
   @choice_a = 'CHOICE_A'
   @choice_b = 'CHOICE_B'
-  # @year_freshman = 2020
-  @participants_per_category = 250
+  @year_freshman = 2020
+  @participants_per_category = 350
   @new_hacker_limit = 100
+  @flight_hackers = 25
+  @bus_schools = ['Georgia Institute of Technology', 'University of Maryland - College Park', 'University of Virginia']
+  @triangle_schools = ['Duke University', 'North Carolina State University', 'University of North Carolina - Chapel Hill']
 
   # judging session variables
   @judging_status = false
