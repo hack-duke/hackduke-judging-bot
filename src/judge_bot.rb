@@ -221,7 +221,8 @@ end
 
 def leaderboard_command(client, data, match)
   return unless @session_validator.active_judging_session(@judging_status, client, data)
-  ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+  # ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+  ids = @reg_request_manager.submission_titles_ids
   body = @algo_request_manager.get_results(ids)
   if body['error'].to_s == ''
     judge_counts = body['judge_counts']
