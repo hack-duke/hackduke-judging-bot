@@ -122,8 +122,8 @@ class JudgeBot < SlackRubyBot::Bot
     valid_type =  @session_validator.validate_type(@bot_type, @bot_types, client, data)
     return unless valid_season && valid_event && valid_year && valid_type
     session_name = @bot_season + @bot_event + @bot_year.to_s + @bot_type
-    ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-    error = @algo_request_manager.start_judging_session(ids, session_name)
+    ids = @reg_request_manager.submission_titles_ids
+    error = @algo_request_manager.start_judging_session(ids.to_a, session_name)
     if error == ''
       @judging_status = true
       client.say(text: 'An active ' + @bot_type + ' judging session for ' + @bot_event + ' ' + 
@@ -248,8 +248,9 @@ end
 def judge_command(client, data, match)
   return unless @session_validator.active_judging_session(@judging_status, client, data)
   # ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
-  ids = @reg_request_manager.submission_titles
-  result = @algo_request_manager.get_judge_decision(ids, data.user)
+  ids = @reg_request_manager.submission_titles_ids
+  result = @algo_request_manager.get_judge_decision(ids.to_a, data.user)
+  titles = @reg_request_manager.submission_titles
   # participant_one = @reg_request_manager.participant_for_id(result[0])
   # participant_two = @reg_request_manager.participant_for_id(result[1])
   submission_one = @reg_request_manager.submission_for_id(result[0], titles)

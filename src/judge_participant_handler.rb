@@ -63,7 +63,8 @@ end
 
 def fields_for_submission(submission)
   fields = []
-  fields << {title: "Submission Title", value: submission, short: false}
+  fields << {title: "Submission Title", value: submission[0], short: false}
+  fields << {title: "Table Number", value: submission[1], short: false}
 end
 
 # creates slack message field for returning an applicant's info

@@ -21,14 +21,22 @@ class RegistrationRequestManager
     CSV.foreach("public/hd2015.csv") do |row|
       options << row[0]
     end
+    return options
+  end
+
+  def submission_titles_ids
+    options = []
+    CSV.foreach("public/hd2015.csv") do |row|
+      options << row[0]
+    end
     ids = []
-    for i in 1..options.length do
+    for i in 1..options.length
       ids << i
     end
   end
 
   def submission_for_id(id, options)
-    return options[id]
+    return [options[id], id.to_s]
   end
 
   def participants_for_event(bot_season, bot_year, bot_event)
