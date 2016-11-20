@@ -102,6 +102,10 @@ class JudgeBot < SlackRubyBot::Bot
     select_command(client, data, match, 2)
   end
 
+  command 'test' do |client, data, match|
+    client.say(text: @reg_request_manager.submission_titles(), channel: data.channel)
+  end
+
   match /^start judging session (?<season>\w*) (?<event>\w*) (?<year>\d{4}*) (?<type>\w*)$/i do |client, data, match|
     if @judging_status
       client.say(text: 'An active ' + @bot_type + ' judging session for ' + @bot_event + ' ' + 
@@ -243,10 +247,13 @@ end
 
 def judge_command(client, data, match)
   return unless @session_validator.active_judging_session(@judging_status, client, data)
-  ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+  # ids = @reg_request_manager.participant_ids_for_event(@bot_season, @bot_year, @bot_event)
+  ids = @reg_request_manager.submission_titles
   result = @algo_request_manager.get_judge_decision(ids, data.user)
-  participant_one = @reg_request_manager.participant_for_id(result[0])
-  participant_two = @reg_request_manager.participant_for_id(result[1])
-  post_participants_message(client, data, participant_one, participant_two, @default_message_color)
+  # participant_one = @reg_request_manager.participant_for_id(result[0])
+  # participant_two = @reg_request_manager.participant_for_id(result[1])
+  submission_one = @reg_request_manager.submission_for_id(result[0], titles)
+  submission_two = @reg_request_manager.submission_for_id(result[1], titles)
+  post_submissions_message(client, data, submission_one, submission_two, @default_message_color)
 end
   

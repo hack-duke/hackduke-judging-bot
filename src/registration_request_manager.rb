@@ -1,8 +1,10 @@
 require 'httparty'
+require 'csv'
 
 class RegistrationRequestManager
 
   @@base_url = "https://hackduke-api.herokuapp.com/"
+
 
   def participant_ids_for_event(bot_season, bot_year, bot_event)
     endpoint = @@base_url + 'people/ids'
@@ -11,8 +13,22 @@ class RegistrationRequestManager
     if body.code != 200
       return []
     else
-      return body
     end
+  end
+
+  def submission_titles
+    options = []
+    CSV.foreach("public/hd2015.csv") do |row|
+      options << row[0]
+    end
+    ids = []
+    for i in 1..options.length do
+      ids << i
+    end
+  end
+
+  def submission_for_id(id, options)
+    return options[id]
   end
 
   def participants_for_event(bot_season, bot_year, bot_event)

@@ -25,6 +25,32 @@ def post_participants_message(client, data, participant_one, participant_two, co
       )
 end
 
+def post_submissions_message(client, data, submission_one, submission_two, color)
+  client.web_client.chat_postMessage(
+        channel: data.channel,
+        as_user: true,
+        attachments: [
+          {
+            pretext: "Please choose between the following two entries by typing '1' or '2'",
+            author_name:  "First Submission",
+            fields: fields_for_submission(submission_one),
+            color: @default_message_color
+          }
+        ]
+      )
+  client.web_client.chat_postMessage(
+        channel: data.channel,
+        as_user: true,
+        attachments: [
+          {
+            author_name:  "Second Submission",
+            fields: fields_for_submission(submission_two),
+            color: @default_message_color
+          }
+        ]
+      )
+end
+
 # checks whether the applicant ID is valid for the current event
 def output_for_participant(id, data, requires_current_reviewer=true)
   if all_participant_ids_for_event.include? id
@@ -33,6 +59,11 @@ def output_for_participant(id, data, requires_current_reviewer=true)
     output = "Applicant ID " + id.to_s + " does not exist for this event!"
   end
   output
+end
+
+def fields_for_submission(submission)
+  fields = []
+  fields << {title: "Submission Title", value: submission, short: false}
 end
 
 # creates slack message field for returning an applicant's info
